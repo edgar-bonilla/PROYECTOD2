@@ -1,7 +1,11 @@
 <template>
   <header class="app-header">
     <div class="logo">
-      
+      <nav>
+      <ul>
+        <li><a href="/">inicio</a></li>    
+      </ul>
+    </nav>       
     </div>
     <nav>
       <ul>
