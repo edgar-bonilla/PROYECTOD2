@@ -125,7 +125,7 @@ export default {
   async created() {
     try {
       
-      const response = await axios.get('/.netlify/functions/disenadores');
+      const response = await axios.get(`${this.$url}/.netlify/functions/disenadores`);
       this.disenadores = response.data.data; 
     } catch (error) {
       console.error('Hubo un error al cargar los diseñadores:', error);
@@ -140,7 +140,7 @@ export default {
       this.nuevoDisenador = { nombre: '', nacionalidad: '', estilo: '' }; // Limpiar formulario
     },
     async createDisenador() {
-      const response = await axios.post('/.netlify/functions/createDisenador', this.nuevoDisenador);
+      const response = await axios.post(`${this.$url}/.netlify/functions/createDisenador`, this.nuevoDisenador);
       this.disenadores.push(response.data);
       this.cancelCreate();
     },
@@ -161,7 +161,7 @@ export default {
 
   try {
  
-    const response = await axios.put(`/.netlify/functions/updateDisenador/${this.disenadorEditado.id}`, this.disenadorEditado);
+    const response = await axios.put(`${this.$url}/.netlify/functions/updateDisenador/${this.disenadorEditado.id}`, this.disenadorEditado);
 
   
     if (response.data) {
@@ -196,7 +196,7 @@ async deleteDisenador(disenador) {
 
   try {
     
-    const response = await axios.delete(`/.netlify/functions/deleteDisenador/${disenador.id}`, {
+    const response = await axios.delete(`${this.$url}/.netlify/functions/deleteDisenador/${disenador.id}`, {
       data: { id: disenador.id }  
     });
 
