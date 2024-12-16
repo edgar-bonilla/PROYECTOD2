@@ -112,7 +112,7 @@ export default {
   },
   async mounted() {
     try {
-      const response = await axios.get('/.netlify/functions/fabricantes');
+      const response = await axios.get(`${this.$url}/.netlify/functions/fabricantes`);
       this.fabricantes = response.data.data;
     } catch (error) {
       console.error("Error al obtener los fabricantes:", error);
@@ -133,7 +133,7 @@ export default {
       }
 
       try {
-        const response = await axios.post('/.netlify/functions/crearFabricante', this.nuevoFabricante);
+        const response = await axios.post(`${this.$url}/.netlify/functions/crearFabricante`, this.nuevoFabricante);
         this.fabricantes.push(response.data);
         this.cancelCreate();
       } catch (error) {
@@ -156,7 +156,7 @@ export default {
       }
 
       try {
-        const response = await axios.put(`/.netlify/functions/updateFabricante/${this.fabricanteEditado.id}`, this.fabricanteEditado);
+        const response = await axios.put(`${this.$url}/.netlify/functions/updateFabricante/${this.fabricanteEditado.id}`, this.fabricanteEditado);
 
         const index = this.fabricantes.findIndex(f => f.id === response.data.id);
         if (index !== -1) {
@@ -176,7 +176,7 @@ export default {
 
  async deleteFabricante(fabricante) {
   try {
-    await axios.delete(`/.netlify/functions/deleteFbticante/${fabricante.id}`, {
+    await axios.delete(`${this.$url}/.netlify/functions/deleteFbticante/${fabricante.id}`, {
       data: { id: fabricante.id }  
     });
     this.fabricantes = this.fabricantes.filter(f => f.id !== fabricante.id);

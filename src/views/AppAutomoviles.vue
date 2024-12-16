@@ -206,7 +206,7 @@ export default {
       }
 
 
-      axios.post('/.netlify/functions/crearAutomovil', this.nuevoAutomovil)
+      axios.post(`${this.$url}/.netlify/functions/crearAutomovil`, this.nuevoAutomovil)
         .then(response => {
           this.automoviles.push(response.data);
           this.showTab = 'table';
@@ -225,7 +225,7 @@ export default {
       this.showTab = 'table';
     },
     updateAutomovil() {
-      axios.put(`/.netlify/functions/updateaAutomovil/${this.automovilEditado.id}`, this.automovilEditado)
+      axios.put(`${this.$url}/.netlify/functions/updateaAutomovil/${this.automovilEditado.id}`, this.automovilEditado)
         .then(response => {
           const index = this.automoviles.findIndex(a => a.id === response.data.id);
           if (index !== -1) {
@@ -248,7 +248,7 @@ export default {
 
   try {
    
-    await axios.delete(`/.netlify/functions/deleteAutomovil/${automovil.id}`, {
+    await axios.delete(`${this.$url}/.netlify/functions/deleteAutomovil/${automovil.id}`, {
       data: { id: automovil.id }  
     });
     
