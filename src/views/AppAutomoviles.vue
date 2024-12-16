@@ -179,13 +179,13 @@ export default {
   async created() {
     try {
 
-      const automovilesResponse = await axios.get('/.netlify/functions/automoviles');
+      const automovilesResponse = await axios.get(`${this.$url}/.netlify/functions/automoviles`);
       this.automoviles = automovilesResponse.data.data;
 
-      const fabricantesResponse = await axios.get('/.netlify/functions/fabricantes');
+      const fabricantesResponse = await axios.get(`${this.$url}/.netlify/functions/fabricantes`);
       this.fabricantes = fabricantesResponse.data.data;
 
-      const disenadoresResponse = await axios.get('/.netlify/functions/disenadores');
+      const disenadoresResponse = await axios.get(`${this.$url}/.netlify/functions/disenadores`);
       this.disenadores = disenadoresResponse.data.data;
     } catch (error) {
       console.error('Hubo un error al cargar los datos:', error);
