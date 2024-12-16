@@ -1,6 +1,7 @@
 "use strict";
 require('dotenv').config();
 const Redis = require('ioredis');
+const headers = require('./headersCORS');
 
 const redis = new Redis({
   host: process.env.REDIS_HOST,
