@@ -11,18 +11,32 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
- 
-    const body = JSON.parse(event.body);
-    const { id, nombre, nacionalidad, estilo, imagen } = body;
-
-
-    if (!nombre || !nacionalidad || !estilo) {
+    if (event.httpMethod === 'OPTIONS') {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Todos los campos son obligatorios: id, nombre, nacionalidad, estilo, imagen' }),
+        statusCode: 204,
+        headers,
+        body: JSON.stringify({}),
       };
     }
 
+    const body = JSON.parse(event.body);
+    const { id, nombre, nacionalidad, estilo, imagen } = body;
+
+    if (!id) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'El campo id es obligatorio para actualizar un diseñador' }),
+      };
+    }
+
+    if (!nombre && !nacionalidad && !estilo && !imagen) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Debe proporcionar al menos uno de los campos: nombre, nacionalidad, estilo o imagen' }),
+      };
+    }
 
     const key = `disenador:${id}`;
     const exists = await redis.exists(key);
@@ -30,41 +44,38 @@ exports.handler = async function (event, context) {
     if (!exists) {
       return {
         statusCode: 404,
+        headers,
         body: JSON.stringify({ error: `No se encontró un diseñador con el id ${id}` }),
       };
     }
 
+    const updatedFields = {};
+    if (nombre) updatedFields.nombre = nombre;
+    if (nacionalidad) updatedFields.nacionalidad = nacionalidad;
+    if (estilo) updatedFields.estilo = estilo;
+    if (imagen) updatedFields.imagen = imagen;
 
-    await redis.hset(key, {
-      id: id.toString(),
-      nombre,
-      nacionalidad,
-      estilo,
-      imagen,
-    });
+    await redis.hset(key, updatedFields);
 
- 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         message: 'Diseñador actualizado exitosamente',
-        data: {
-          id,
-          nombre,
-          nacionalidad,
-          estilo,
-          imagen
-        }
+        data: { 
+          id, 
+          ...updatedFields 
+        },
       }),
     };
 
   } catch (error) {
-   
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: 'Error al actualizar el diseñador', details: error.message }),
     };
   } finally {
-    await redis.quit();
+    redis.disconnect();
   }
 };

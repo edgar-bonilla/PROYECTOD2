@@ -1,6 +1,6 @@
 "use strict";
 require('dotenv').config();
-const Redis = require('ioredis')
+const Redis = require('ioredis');
 const headers = require('./headersCORS');
 
 const redis = new Redis({
@@ -11,48 +11,60 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
-  
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 204,
+        headers,
+        body: JSON.stringify({}),
+      };
+    }
+
     const body = JSON.parse(event.body);
     const { id, nombre, pais, anio_fundacion, imagen } = body;
 
- 
-    if (!id || !nombre || !pais || !anio_fundacion ) {
+    if (!id) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Todos los campos son obligatorios: id, nombre, pais, anio_fundacion, imagen' }),
+        headers,
+        body: JSON.stringify({ error: 'El campo id es obligatorio para actualizar un fabricante' }),
       };
     }
 
+    if (!nombre && !pais && !anio_fundacion && !imagen) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ error: 'Debe proporcionar al menos uno de los campos: nombre, pais, anio_fundacion o imagen' }),
+      };
+    }
 
     const key = `fabricante:${id}`;
-    const fabricante = await redis.hgetall(key);
+    const exists = await redis.exists(key);
 
-    if (!fabricante || Object.keys(fabricante).length === 0) {
+    if (!exists) {
       return {
         statusCode: 404,
-        body: JSON.stringify({ error: 'Fabricante no encontrado' }),
+        headers,
+        body: JSON.stringify({ error: `No se encontró un fabricante con el id ${id}` }),
       };
     }
 
-  
-    await redis.hset(key, {
-      nombre,
-      pais,
-      anio_fundacion: anio_fundacion.toString(),
-      imagen,
-    });
+    const updatedFields = {};
+    if (nombre) updatedFields.nombre = nombre;
+    if (pais) updatedFields.pais = pais;
+    if (anio_fundacion) updatedFields.anio_fundacion = anio_fundacion.toString();
+    if (imagen) updatedFields.imagen = imagen;
 
+    await redis.hset(key, updatedFields);
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         message: 'Fabricante actualizado exitosamente',
-        data: {
-          id,
-          nombre,
-          pais,
-          anio_fundacion,
-          imagen,
+        data: { 
+          id, 
+          ...updatedFields 
         },
       }),
     };
@@ -61,9 +73,10 @@ exports.handler = async function (event, context) {
     console.error('❌ Error al actualizar el fabricante:', error);
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: 'Error al actualizar el fabricante', details: error.message }),
     };
   } finally {
-    await redis.quit();
+    redis.disconnect();
   }
 };

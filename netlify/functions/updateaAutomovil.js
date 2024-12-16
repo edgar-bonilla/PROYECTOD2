@@ -11,13 +11,21 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
-  
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 204,
+        headers,
+        body: JSON.stringify({}),
+      };
+    }
+
     const body = JSON.parse(event.body);
     const { id, nombre, año, velocidad_maxima, fabricante_id, disenador_id, imagen } = body;
 
     if (!id) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'El campo id es obligatorio para actualizar un automóvil' }),
       };
     }
@@ -28,6 +36,7 @@ exports.handler = async function (event, context) {
     if (!exists) {
       return {
         statusCode: 404,
+        headers,
         body: JSON.stringify({ error: `No se encontró un automóvil con el id ${id}` }),
       };
     }
@@ -44,6 +53,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({ 
         message: 'Automóvil actualizado exitosamente', 
         data: { 
@@ -54,12 +64,12 @@ exports.handler = async function (event, context) {
     };
 
   } catch (error) {
-  
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: 'Error al actualizar el automóvil', details: error.message }),
     };
   } finally {
-    await redis.quit();
+    redis.disconnect();
   }
 };
