@@ -11,19 +11,19 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
-   
     const keys = await redis.keys('automovil:*');
 
     if (keys.length === 0) {
       return {
         statusCode: 404,
+        headers: headers,
         body: JSON.stringify({ message: 'No se encontraron automóviles' }),
       };
     }
 
     const automovilesPromises = keys.map(async (key) => {
       const tipo = await redis.type(key);
-      if (tipo !== 'hash') return null; 
+      if (tipo !== 'hash') return null;
       const automovil = await redis.hgetall(key);
       return {
         id: automovil.id,
@@ -32,7 +32,7 @@ exports.handler = async function (event, context) {
         velocidad_maxima: automovil.velocidad_maxima,
         fabricante_id: automovil.fabricante_id,
         disenador_id: automovil.disenador_id,
-        imagen: automovil.imagen
+        imagen: automovil.imagen,
       };
     });
 
@@ -40,6 +40,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
+      headers: headers,
       body: JSON.stringify({ 
         message: 'Automóviles recuperados exitosamente', 
         data: automoviles 
@@ -49,6 +50,7 @@ exports.handler = async function (event, context) {
   } catch (error) {
     return {
       statusCode: 500,
+      headers: headers,
       body: JSON.stringify({ error: 'Error al recuperar los automóviles', details: error.message }),
     };
   } finally {
