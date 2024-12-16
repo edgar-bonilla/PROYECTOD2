@@ -1,8 +1,8 @@
 "use strict";
 require('dotenv').config();
 const Redis = require('ioredis');
+const headers = require('./headersCORS');
 
-// 🔹 Configuración de Redis
 const redis = new Redis({
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT || 6379,
@@ -11,11 +11,11 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
-    // 🔹 1️⃣ Obtener los datos del cuerpo de la solicitud
+  
     const body = JSON.parse(event.body);
     const { id } = body;
 
-    // 🔍 2️⃣ Validar el ID del diseñador
+  
     if (!id) {
       return {
         statusCode: 400,
@@ -23,7 +23,7 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // 🔍 3️⃣ Verificar si el diseñador existe en Redis
+ 
     const key = `disenador:${id}`;
     const exists = await redis.exists(key);
 
@@ -34,10 +34,10 @@ exports.handler = async function (event, context) {
       };
     }
 
-    // ❌ 4️⃣ Eliminar el diseñador de Redis
+    
     await redis.del(key);
 
-    // 🟢 5️⃣ Respuesta de éxito
+  
     return {
       statusCode: 200,
       body: JSON.stringify({
