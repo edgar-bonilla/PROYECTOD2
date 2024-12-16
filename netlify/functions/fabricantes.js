@@ -11,13 +11,20 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
-  
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 204,
+        headers,
+        body: JSON.stringify({}),
+      };
+    }
+
     const keys = await redis.keys('fabricante:*');
 
     if (keys.length === 0) {
       return {
         statusCode: 404,
-          headers: headers,
+        headers,
         body: JSON.stringify({ message: 'No se encontraron fabricantes' }),
       };
     }
@@ -37,10 +44,9 @@ exports.handler = async function (event, context) {
 
     const fabricantes = (await Promise.all(fabricantesPromises)).filter(fabricante => fabricante !== null);
 
-    
     return {
       statusCode: 200,
-        headers: headers,
+      headers,
       body: JSON.stringify({ 
         message: 'Fabricantes recuperados exitosamente', 
         data: fabricantes 
@@ -48,13 +54,13 @@ exports.handler = async function (event, context) {
     };
 
   } catch (error) {
-
+    console.error('❌ Error al recuperar los fabricantes:', error);
     return {
       statusCode: 500,
-        headers: headers,
+      headers,
       body: JSON.stringify({ error: 'Error al recuperar los fabricantes', details: error.message }),
     };
   } finally {
-    await redis.quit();
+    redis.disconnect(); 
   }
 };

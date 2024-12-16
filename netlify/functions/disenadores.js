@@ -11,17 +11,23 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 204,
+        headers,
+        body: JSON.stringify({}),
+      };
+    }
 
     const keys = await redis.keys('disenador:*');
 
     if (keys.length === 0) {
       return {
         statusCode: 404,
-         headers: headers,
+        headers,
         body: JSON.stringify({ message: 'No se encontraron diseñadores' }),
       };
     }
-
 
     const disenadoresPromises = keys.map(async (key) => {
       const tipo = await redis.type(key);
@@ -40,7 +46,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
-       headers: headers,
+      headers,
       body: JSON.stringify({
         message: 'Diseñadores recuperados exitosamente',
         data: disenadores
@@ -48,13 +54,13 @@ exports.handler = async function (event, context) {
     };
 
   } catch (error) {
-
+    console.error('❌ Error al recuperar los diseñadores:', error);
     return {
       statusCode: 500,
-       headers: headers,
+      headers,
       body: JSON.stringify({ error: 'Error al recuperar los diseñadores', details: error.message }),
     };
   } finally {
-    await redis.quit();
+    redis.disconnect();
   }
 };
