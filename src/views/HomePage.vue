@@ -12,7 +12,7 @@
         <p>Conoce las marcas icónicas que producen estos vehículos.</p>
       </div>
 
-      <div class="card" @click="navigateTo('/diseñadores')">
+      <div class="card" @click="navigateTo('/disenadores')">
         <h2>Diseñadores</h2>
         <p>Descubre a los visionarios detrás de cada diseño impresionante.</p>
       </div>
