@@ -11,25 +11,28 @@ const redis = new Redis({
 
 exports.handler = async function (event, context) {
   try {
-   
+    if (event.httpMethod === 'OPTIONS') {
+      return {
+        statusCode: 204,
+        headers,
+        body: JSON.stringify({}),
+      };
+    }
+
     const body = JSON.parse(event.body);
     const { nombre, nacionalidad, estilo, imagen } = body;
 
-    
-    if (!nombre || !nacionalidad || !estilo ) {
+    if (!nombre || !nacionalidad || !estilo) {
       return {
         statusCode: 400,
+        headers,
         body: JSON.stringify({ error: 'Todos los campos son obligatorios: nombre, nacionalidad, estilo, imagen' }),
       };
     }
 
-  
     const id = await redis.incr('disenador:id');
-
-  
     const key = `disenador:${id}`;
 
-  
     await redis.hset(key, {
       id: id.toString(),
       nombre,
@@ -38,9 +41,9 @@ exports.handler = async function (event, context) {
       imagen,
     });
 
-   
     return {
       statusCode: 201,
+      headers,
       body: JSON.stringify({
         message: 'Diseñador creado exitosamente',
         data: {
@@ -54,9 +57,9 @@ exports.handler = async function (event, context) {
     };
 
   } catch (error) {
-  
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ error: 'Error al crear el diseñador', details: error.message }),
     };
   } finally {
