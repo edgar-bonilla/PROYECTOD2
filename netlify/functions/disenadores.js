@@ -1,7 +1,7 @@
 "use strict";
 require('dotenv').config();
 const Redis = require('ioredis');
-
+const headers = require('./headersCORS');
 const redis = new Redis({
   host: process.env.REDIS_HOST,
   port: process.env.REDIS_PORT || 6379,
@@ -16,6 +16,7 @@ exports.handler = async function (event, context) {
     if (keys.length === 0) {
       return {
         statusCode: 404,
+         headers: headers,
         body: JSON.stringify({ message: 'No se encontraron diseñadores' }),
       };
     }
@@ -38,6 +39,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
+       headers: headers,
       body: JSON.stringify({
         message: 'Diseñadores recuperados exitosamente',
         data: disenadores
@@ -48,6 +50,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 500,
+       headers: headers,
       body: JSON.stringify({ error: 'Error al recuperar los diseñadores', details: error.message }),
     };
   } finally {
