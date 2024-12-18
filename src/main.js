@@ -7,8 +7,4 @@ const app = createApp(App);
 
 
 
-
-
-app.config.globalProperties.$url =  'https://catalogocarsredis.netlify.app';
-
 app.use(router).mount('#app');
