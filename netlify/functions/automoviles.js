@@ -1,7 +1,7 @@
 "use strict";
 require('dotenv').config();
 const Redis = require('ioredis');
-const headers = require('./headersCORS');
+const headers = require('./headersCORS'); // Importar los encabezados CORS
 
 const redis = new Redis({
   host: process.env.REDIS_HOST,
@@ -16,7 +16,7 @@ exports.handler = async function (event, context) {
     if (keys.length === 0) {
       return {
         statusCode: 404,
-        headers: headers,
+        headers: headers,  // Incluir encabezados CORS
         body: JSON.stringify({ message: 'No se encontraron automóviles' }),
       };
     }
@@ -40,7 +40,7 @@ exports.handler = async function (event, context) {
 
     return {
       statusCode: 200,
-      headers: headers,
+      headers: headers,  // Incluir encabezados CORS
       body: JSON.stringify({ 
         message: 'Automóviles recuperados exitosamente', 
         data: automoviles 
@@ -50,7 +50,7 @@ exports.handler = async function (event, context) {
   } catch (error) {
     return {
       statusCode: 500,
-      headers: headers,
+      headers: headers,  // Incluir encabezados CORS
       body: JSON.stringify({ error: 'Error al recuperar los automóviles', details: error.message }),
     };
   } finally {
