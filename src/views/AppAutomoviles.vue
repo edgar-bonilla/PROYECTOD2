@@ -179,7 +179,7 @@ export default {
   async created() {
     try {
 
-      const automovilesResponse = await axios.get('/.netlify/functions/automoviles');
+      const automovilesResponse = await axios.get(`${this.$url}/.netlify/functions/automoviles`);
       this.automoviles = automovilesResponse.data.data;
 
       const fabricantesResponse = await axios.get(`${this.$url}/.netlify/functions/fabricantes`);
